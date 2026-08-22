@@ -1,0 +1,45 @@
+# Template file for 'unreal-engine-manager'
+pkgname=unreal-engine-manager
+version=0.0.2
+revision=1
+depends="python3 python3-tkinter"
+make_dirs="/opt/unreal-engine-bin 0777 root root"
+short_desc="Python-based Linux application for managing Unreal Engine installations"
+maintainer="Aryo Nazaradeh <aryo.nazaradeh@gmail.com>"
+license="Apache-2.0"
+homepage="https://github.com/matheusvilano/unreal-engine-manager"
+changelog="https://github.com/matheusvilano/unreal-engine-manager/releases"
+#distfiles="https://github.com/matheusvilano/unreal-engine-manager/archive/refs/tags/v${version}.tar.gz"
+distfiles="mime-file-permission-check.tar.gz::https://github.com/nazaradeh/unreal-engine-manager/archive/refs/heads/fix/mime-file-permission-check.tar.gz"
+checksum=692048ae822571b5d6bf0d39ae7c98f2b1d5ca783bea25884ca277687bd9a216
+#checksum=d73465621de4f4f223dc57822f595dfaa3a49fe509d0f4e1955aaa2d8f054816
+
+do_install() {
+	# Install application code
+	vmkdir opt/unreal-engine-manager
+	vcopy source opt/unreal-engine-manager
+	vcopy resources opt/unreal-engine-manager
+
+	# Create symlink for better compatibility
+	vmkdir usr/bin
+	ln -sf /opt/unreal-engine-manager/source/main.py ${DESTDIR}/usr/bin/unreal-engine-manager
+
+	# Install icons
+	for resolution in 16 24 32 48 64 256; do
+		vinstall resources/ue${resolution}.png 644 \
+			usr/share/icons/hicolor/${resolution}x${resolution}/apps \
+			unreal-engine.png
+	done
+
+	# Install Desktop File
+	vinstall resources/app.desktop 644 \
+		usr/share/applications \
+		unreal-engine-manager.desktop
+
+	# Install MIME Types
+	vinstall resources/mime.xml 644 \
+		usr/share/mime/packages \
+		unreal-engine.xml
+
+	vdoc readme.md
+}
